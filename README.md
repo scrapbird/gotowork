@@ -6,39 +6,39 @@ Provides a simple and easy to use worker queue for golang.
 package main
 
 import (
-	"fmt"
-	"github.com/scrapbird/gotowork"
+    "fmt"
+    work "github.com/scrapbird/gotowork"
 )
 
 func main () {
-	// create the workerqueue
-	workerQueue := make(WorkerQueue, 5)
+    // create the workerqueue
+    workerQueue := make(work.WorkerQueue, 5)
 
-	// create and start the workers
-	workers := make([]Worker, 5)
-	for i := range workers {
-		workers[i] = NewWorker(i, workerQueue)
-		workers[i].Start()
-	}
+    // create and start the workers
+    workers := make([]work.Worker, 5)
+    for i := range workers {
+        workers[i] = work.NewWorker(i, workerQueue)
+        workers[i].Start()
+    }
 
-	// add some jobs
-	for i := 0; i < 5; i++ {
-		// get a free worker
-		worker := <-workerQueue
-		// give it some work
-		worker <- func () {
-			fmt.Println("Hello")
-		}
-	}
+    // add some jobs
+    for i := 0; i < 5; i++ {
+        // get a free worker
+        worker := <-workerQueue
+        // give it some work
+        worker <- func () {
+            fmt.Println("Hello")
+        }
+    }
 
-	// tell the workers to stop waiting for work
-	for i := range workers {
-		workers[i].Stop()
-	}
+    // tell the workers to stop waiting for work
+    for i := range workers {
+        workers[i].Stop()
+    }
 
-	// wait for the workers to quit
-	for i := range workers {
-		workers[i].WaitForFinish()
-	}
+    // wait for the workers to quit
+    for i := range workers {
+        workers[i].WaitForFinish()
+    }
 }
 ```
