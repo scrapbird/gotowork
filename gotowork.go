@@ -5,21 +5,24 @@ package gotowork
 type Work func()
 
 // Define the worker queue
-type WorkerQueue chan chan Work
+type WorkerQueue chan Inbox
 
 // Define the inbox
 type Inbox chan Work
 
-// Define the worker
+// This is the worker type, this is used to keep track of which queue the worker is in and the worker id, signaling channels etc.
 type Worker struct {
-	id          int         // id of the worker
-	inbox       Inbox       // channel to send work requests to this worker
-	workerQueue WorkerQueue // channel to register with to receive jobs
-	quit        chan bool   // worker will quit if a message is received here
-	done        chan bool   // used to signal that worker is finished
+	id          int
+	inbox       Inbox
+	workerQueue WorkerQueue
+	quit        chan bool
+	done        chan bool
 }
 
-// Creates a worker
+// Creates a new worker struct and initializes it.
+//
+//  workerQueue := make(WorkerQueue, 5) // Create worker queue that fits up to 5 workers.
+//  worker := NewWorker(1, workerQueue) // Create a new worker in the queue.
 func NewWorker(id int, workerQueue WorkerQueue) Worker {
 	worker := Worker{
 		id:          id,
@@ -31,7 +34,7 @@ func NewWorker(id int, workerQueue WorkerQueue) Worker {
 	return worker
 }
 
-// Starts the worker
+// Tells the worker to start subscribing to the worker queue and executing jobs.
 func (w Worker) Start() {
 	go func() {
 		for {
@@ -48,14 +51,14 @@ func (w Worker) Start() {
 	}()
 }
 
-// Requests the worker to stop
+// Tells the worker to stop once it has finished it's current job.
 func (w Worker) Stop() {
 	go func() {
 		w.quit <- true
 	}()
 }
 
-// Waits for a worker to finish
+// Waits for a worker to finish before returning.
 func (w Worker) WaitForFinish() {
 	<-w.done
 }
