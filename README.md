@@ -2,7 +2,7 @@
 Provides a simple and easy to use worker queue for golang.
 
 ## Example
-```golang
+```go
 package main
 
 import (
